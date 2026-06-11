@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宿泊税 システム改修等補助金｜申込み・ヒアリング入力</title>
+<style>
+  :root{--ink:#1b2a33;--sub:#5a6b74;--line:#dde6ea;--bg:#eef3f5;--card:#fff;
+        --acc:#0e7c86;--acc-d:#0a5b62;--warn:#b5651d;--err:#c0392b;--ok:#1f8a5b;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-text-size-adjust:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;
+       background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;padding-bottom:90px}
+  header{background:linear-gradient(135deg,#0e7c86,#0a5b62);color:#fff;padding:20px 16px}
+  header h1{font-size:18px;font-weight:800}
+  header p{font-size:13px;opacity:.92;margin-top:6px;line-height:1.5}
+  .wrap{max-width:600px;margin:0 auto;padding:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+  .card h2{font-size:15px;color:var(--acc-d);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .card h2 .n{background:var(--acc);color:#fff;width:24px;height:24px;border-radius:50%;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+  label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin:14px 0 5px}
+  label .req{color:var(--err);font-size:11px;margin-left:4px}
+  .hint{font-size:12px;color:var(--sub);font-weight:400;margin-top:3px}
+  input,select,textarea{width:100%;border:1.5px solid #cfd9de;border-radius:9px;padding:12px;
+        font-size:16px;font-family:inherit;color:var(--ink);background:#fff}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+  textarea{min-height:70px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .seg{display:flex;gap:8px;margin-top:4px}
+  .seg button{flex:1;padding:11px;border:1.5px solid #cfd9de;background:#fff;border-radius:9px;
+        font-size:14px;font-weight:700;color:var(--sub);cursor:pointer}
+  .seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+  .chk{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-size:14px;font-weight:400}
+  .chk input{width:22px;height:22px;flex:0 0 auto;margin-top:1px}
+  .note{background:#fff7e6;border:1px solid #f0d9a8;border-left:4px solid var(--warn);
+        border-radius:9px;padding:11px 12px;font-size:12.5px;color:#7a5a1e;margin-top:8px}
+  .hide{display:none}
+  /* consent */
+  .agree h3{font-size:14px;color:var(--acc-d);margin:16px 0 4px}
+  .agree p{font-size:13.5px;color:#33424a;margin-bottom:2px}
+  .agree .lead{font-size:13.5px;background:#eef7f8;border:1px solid #c8e6e8;border-radius:9px;padding:12px;margin-bottom:6px}
+  .agreeBox{background:#fff;border:2px solid var(--acc);border-radius:10px;padding:14px;margin-top:14px}
+  .bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+       padding:12px 14px;box-shadow:0 -3px 12px rgba(0,0,0,.06)}
+  .bar .inner{max-width:600px;margin:0 auto;display:flex;flex-direction:column;align-items:stretch;gap:6px}
+  .btn{background:var(--acc);color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:800;cursor:pointer}
+  .btn:active{background:var(--acc-d)}
+  .btn:disabled{background:#a9c4c7;cursor:not-allowed}
+  .miss{font-size:12px;color:var(--err);text-align:center;min-height:16px}
+  #outText{width:100%;min-height:240px;font-size:13px;line-height:1.7;background:#0f2b30;color:#d8eef0;
+           border:none;border-radius:12px;padding:14px;font-family:"SF Mono",Consolas,monospace}
+  .copy2{background:var(--ok);width:100%;margin-top:10px}
+  .foot{font-size:11px;color:var(--sub);text-align:center;padding:16px}
+</style>
+</head>
+<body>
+<header>
+  <h1>宿泊税 システム改修等補助金<br>お申込み・ヒアリング入力</h1>
+  <p id="hsub">まずは申込内容をご確認のうえ、ご同意ください。入力は約5分・アプリ不要。内容はこの端末内だけで処理され、どこにも保存されません。</p>
+</header>
+
+<!-- ===== 画面1：申込・同意 ===== -->
+<div class="wrap" id="consentScreen">
+  <div class="card agree">
+    <h2><span class="n">📝</span>補助金申請サポート お申込みについて</h2>
+    <div class="lead">本フォームを送信する事業者さま（以下「お客様」）は、沖縄県宿泊税 システム改修等補助金の申請サポートおよび採択後の製品導入について、下記に同意のうえお申し込みいただきます。</div>
+
+    <h3>第1条　サポートの内容</h3>
+    <p>当社は、お客様の補助金申請にあたり、必要書類のリストアップ・回収サポート、および申請書類の作成サポートを行います。</p>
+    <h3>第2条　費用について（採択前は無料）</h3>
+    <p>本サポートは、補助金の採択が確定するまで費用は一切かかりません。不採択の場合も、お客様への費用請求は発生しません。採択後の製品導入に伴う費用は、補助金を活用する形で別途お見積りをご提示します。</p>
+    <h3>第3条　採択後の製品導入</h3>
+    <p>補助金の採択が確定した場合、お客様は当社が提供する製品・サービスを、当該補助金を活用して導入する契約を締結するものとします。詳細（仕様・費用・納期等）は、採択確定後に当社・お客様で協議のうえ決定します。</p>
+    <h3>第4条　不採択の場合</h3>
+    <p>不採択となった場合、本申込みに基づく一切の義務は消滅し、費用請求は発生しません。再申請を希望される場合は、改めて協議します。</p>
+    <h3>第5条　情報の取り扱い</h3>
+    <p>当社は、お客様から提供を受けた書類・情報を、本申込みの目的以外に使用せず、適切に管理します。</p>
+
+    <div class="agreeBox">
+      <div class="chk" style="margin:0"><input type="checkbox" id="agreeChk" onchange="onAgree()"><label style="margin:0;font-weight:700">上記の内容に同意し、申込みます</label></div>
+      <div class="hint" style="margin-top:8px">※このフォームを最後まで入力し送信した時点で、本申込みに同意したものとして取り扱います。</div>
+    </div>
+  </div>
+  <div style="text-align:center;padding:4px 0 20px">
+    <button class="btn" id="goBtn" style="width:100%;max-width:560px" disabled onclick="goForm()">同意して入力に進む ▶</button>
+  </div>
+</div>
+
+<!-- ===== 画面2：ヒアリング入力 ===== -->
+<div class="wrap hide" id="formScreen">
+
+  <div class="card">
+    <h2><span class="n">1</span>申請者（事業者）情報</h2>
+    <label>事業者の区分 <span class="req">必須</span></label>
+    <div class="seg" id="kbnSeg">
+      <button type="button" data-v="法人" onclick="setKbn('法人')">法人</button>
+      <button type="button" data-v="個人事業主" class="on" onclick="setKbn('個人事業主')">個人事業主</button>
+    </div>
+    <div id="houjinName">
+      <label>法人名（商号） <span class="req">必須</span></label><input id="org" placeholder="株式会社○○">
+      <label>法人名フリガナ</label><input id="orgKana" placeholder="カブシキガイシャ○○">
+    </div>
+    <div id="yagou">
+      <label>屋号（あれば）</label><input id="yago" placeholder="古民家 ○○">
+    </div>
+    <label id="repPosL" class="hide">代表者 役職</label>
+    <input id="repPos" class="hide" placeholder="代表取締役">
+    <label id="repNameL">氏名（ご本人） <span class="req">必須</span></label><input id="repName" placeholder="沖縄 太郎">
+    <label>氏名フリガナ <span class="req">必須</span></label><input id="repKana" placeholder="オキナワ タロウ">
+    <div class="row">
+      <div><label>郵便番号 <span class="req">必須</span></label><input id="zip" inputmode="numeric" placeholder="000-0000"></div>
+      <div><label>電話番号 <span class="req">必須</span></label><input id="tel" inputmode="tel" placeholder="090-0000-0000"></div>
+    </div>
+    <label>住所 <span class="req">必須</span></label><input id="addr" placeholder="沖縄県○○市○○ 0-0-0">
+    <label>E-mail <span class="req">必須</span></label><input id="mail" inputmode="email" placeholder="info@example.com">
+  </div>
+
+  <div class="card">
+    <h2><span class="n">2</span>申請担当者</h2>
+    <div class="chk"><input type="checkbox" id="same" checked onchange="r()"><label style="margin:0;font-weight:400">申請者ご本人と同じ</label></div>
+    <div id="tantou" class="hide">
+      <label>担当者名</label><input id="tName" placeholder="沖縄 花子">
+      <label>部署</label><input id="tDept" placeholder="総務部">
+      <div class="row">
+        <div><label>電話番号</label><input id="tTel" inputmode="tel"></div>
+        <div><label>E-mail</label><input id="tMail" inputmode="email"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">3</span>宿泊施設の情報</h2>
+    <label>施設名称 <span class="req">必須</span></label><input id="fName" placeholder="○○ホテル / 古民家○○">
+    <label>施設名称フリガナ</label><input id="fKana" placeholder="○○ホテル">
+    <div class="row">
+      <div><label>施設 郵便番号 <span class="req">必須</span></label><input id="fZip" inputmode="numeric" placeholder="000-0000"></div>
+      <div><label>施設 電話番号</label><input id="fTel" inputmode="tel"></div>
+    </div>
+    <label>施設 住所 <span class="req">必須</span></label><input id="fAddr" placeholder="沖縄県○○">
+    <label>営業形態 <span class="req">必須</span></label>
+    <div class="seg" id="gyoSeg">
+      <button type="button" data-v="旅館業" class="on" onclick="setGyo('旅館業')">旅館業（ホテル・旅館等）</button>
+      <button type="button" data-v="住宅宿泊事業" onclick="setGyo('住宅宿泊事業')">民泊</button>
+    </div>
+    <div id="ryokanBox">
+      <label>旅館業営業許可番号 <span class="req">必須</span></label><input id="lic" placeholder="○○保第R0-00号">
+      <div class="hint">承継した場合は、承継承認書の番号も別途お知らせください。</div>
+    </div>
+    <div id="minpakuBox" class="hide">
+      <label>住宅宿泊事業届出番号 <span class="req">必須</span></label><input id="todoke" placeholder="M000000000">
+    </div>
+    <label>宿泊税 特別徴収義務者の登録状況 <span class="req">必須</span></label>
+    <select id="toku"><option value="">選択してください</option><option>登録済</option><option>申請中</option><option>未申請</option></select>
+    <div class="hint">未申請でも、実績報告日までに登録すればOKです。</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">4</span>振込口座（補助金の受取口座）</h2>
+    <div class="hint" style="margin-bottom:6px">通帳の表紙・見開きの写しもLINEでお送りください。名義は申請者ご本人の口座にしてください。</div>
+    <label>金融機関名 <span class="req">必須</span></label><input id="bank" placeholder="○○銀行 / ○○信用金庫 / ○○農協">
+    <div class="row">
+      <div><label>金融機関コード</label><input id="bankCode" inputmode="numeric" placeholder="0000"></div>
+      <div><label>支店コード</label><input id="brCode" inputmode="numeric" placeholder="000"></div>
+    </div>
+    <label>支店名 <span class="req">必須</span></label><input id="branch" placeholder="○○支店">
+    <label>預金種別 <span class="req">必須</span></label>
+    <select id="ptype"><option>普通</option><option>当座</option><option>別段</option></select>
+    <label>口座番号 <span class="req">必須</span></label><input id="bnum" inputmode="numeric" placeholder="1234567">
+    <label>口座名義（カナ） <span class="req">必須</span></label><input id="bname" placeholder="オキナワ タロウ / カ）○○">
+    <div class="hint">通帳どおりのカナで。法人は「カ）」など、個人はお名前のカナ。</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">5</span>お手元の書類（準備できたものに☑）</h2>
+    <div class="hint" style="margin-bottom:4px">☑したものは、この後LINEで写真／PDFをお送りください。</div>
+    <div class="chk"><input type="checkbox" class="att" data-l="旅館業許可証（又は承継承認書）"><label style="margin:0;font-weight:400">旅館業許可証（又は承継承認書）</label></div>
+    <div class="chk"><input type="checkbox" class="att" data-l="県税に滞納がない証明書"><label style="margin:0;font-weight:400">県税に滞納がない証明書</label></div>
+    <div class="chk"><input type="checkbox" class="att" data-l="通帳の写し（表紙＋見開き）"><label style="margin:0;font-weight:400">通帳の写し（表紙＋見開き）</label></div>
+    <label style="margin-top:14px">ご要望・補足（任意）</label>
+    <textarea id="biko" placeholder="ご質問・気になる点などあればご記入ください"></textarea>
+  </div>
+
+  <div id="out" class="hide">
+    <div class="card" style="border-color:var(--acc)">
+      <h2><span class="n">①</span>入力内容をLINEで送る</h2>
+      <div class="hint" style="margin-bottom:8px">下のボタンでコピー → LINEに貼り付けて送信。うまくコピーできない時は枠内を長押し→全選択→コピー。<b>送信をもって申込みに同意</b>したものとして取り扱います。</div>
+      <textarea id="outText" readonly></textarea>
+      <button class="btn copy2" onclick="copyOut(this)">📋 内容をコピー</button>
+    </div>
+
+    <div class="card" style="border-color:var(--acc)">
+      <h2><span class="n">②</span>誓約書にサインする</h2>
+      <div class="hint" style="margin-bottom:10px">下の誓約書をご確認のうえ、署名欄に<b>指でサイン</b> →「PDFを作成」で保存 → LINEで送ってください。</div>
+      <div id="seiyakuDoc" style="background:#fff;color:#111;border:1px solid #ccc;border-radius:6px;padding:16px;font-size:11px;line-height:1.6">
+        <div style="text-align:center;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:10px">宣誓・同意書</div>
+        <p style="margin-bottom:6px">沖縄県宿泊税への対応に向けたシステム改修等補助金（以下「本補助金」という。）の申請に伴い、次の１～４までの全事項を宣誓し、５～８までのいずれにも同意します。また、虚偽の宣誓を行った場合又は同意した事項に違反した場合は、本補助金交付要綱（以下「交付要綱」という。）第８条に基づく交付決定を受けていない場合は本補助金の交付申請を辞退し、交付要綱第８条に基づく交付決定を受け補助事業を実施又は完了したが本補助金の支払を受けていない場合は、交付要綱第11条に基づく補助事業の廃止の申請を行い、交付要綱第17条に基づく本補助金の支払いを受けていた場合は速やかに沖縄県に返還します。</p>
+        <p>１　交付要綱及び沖縄県が定める公募要領等に定める補助対象要件を満たしていること</p>
+        <p>２　本補助金の交付を受ける者として、別紙記載の「特別徴収義務者としての登録等の規定に関する誓約事項」、「暴力団排除に関する誓約事項」に同意していること</p>
+        <p>３　本補助金の申請内容全てに虚偽がないこと</p>
+        <p>４　「虚偽の申請による不正受給」、「補助金の目的外利用」や「補助金受給額を不当に釣り上げ、関係者へ報酬を配賦する」といった不正な行為に加担していないこと及び今後も加担しないこと</p>
+        <p>５　交付要綱第14条に基づき知事が行う立入検査等について応じること</p>
+        <p>６　提出した申請内容に記載された情報が本補助金の事務等のために第三者に提供される場合（補助対象要件の充足性を判断するために沖縄県が申請者の申請内容に記載された情報を第三者に提供する場合を含む。）及び本補助金の交付等に必要な範囲において申請者の個人情報が第三者から取得される場合（補助対象要件の充足性を判断するために沖縄県が申請者の個人情報を第三者から取得する場合を含む。）があること</p>
+        <p>７　本補助金を不正に受給した疑いがある場合には、補助金の受給者立ち会いのもと、事業に係る取引先（委託先、外注（請負）先等を含む）や補助金の受給者に対し現地調査等を実施すること</p>
+        <p>８　交付要綱等並びに県知事の指示に従うこと</p>
+        <div style="margin-top:12px">
+          <div id="docDate">令和　年　月　日</div>
+          <div style="margin-top:6px">事業者名　<span id="docOrg"></span></div>
+          <div>施設名　　<span id="docFacility"></span></div>
+          <div style="margin-top:8px;display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap">
+            <span>法人代表者又は個人事業主の氏名（自署）</span>
+            <img id="docSig" alt="" style="height:40px">
+          </div>
+        </div>
+      </div>
+      <label>署名欄（ここに指でサイン）</label>
+      <canvas id="sigCanvas" style="width:100%;height:160px;border:2px dashed #9ec3c6;border-radius:9px;background:#fbfdfd;touch-action:none;display:block"></canvas>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button type="button" onclick="clearSig()" style="flex:0 0 auto;padding:11px 16px;border:1.5px solid #cfd9de;background:#fff;border-radius:9px;font-weight:700;color:#5a6b74">消す</button>
+        <button class="btn" style="flex:1" onclick="makePDF(this)">📄 PDFを作成して保存</button>
+      </div>
+      <div class="hint" style="margin-top:8px">※保存だけでは送信されません。保存したPDFファイルを、<b>LINEのトーク画面に添付して送って</b>ください。</div>
+      <div id="pdfDone" class="hide" style="margin-top:10px;background:#eafaf1;border:1px solid #b6e3c8;border-radius:9px;padding:13px;font-size:14px;color:#1f6b46;font-weight:700;text-align:center">✓ 誓約書PDFを保存しました<br>このPDFファイルを LINE に添付して送ってください 📩</div>
+    </div>
+  </div>
+</div>
+
+<div class="bar hide" id="formBar">
+  <div class="inner">
+    <div class="miss" id="miss"></div>
+    <button class="btn" onclick="makeOutput()">入力内容を確認 → コピー用に出力</button>
+  </div>
+</div>
+
+<div class="foot">沖縄県 宿泊税 システム改修等補助金 ｜ 申込み・ヒアリング入力フォーム（試作）<br>不明点は担当（SA）またはお問い合わせ窓口へ</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+let KBN="個人事業主", GYO="旅館業", agreedAt="";
+const $=id=>document.getElementById(id);
+const v=id=>($(id)?$(id).value.trim():"");
+const z2=n=>('0'+n).slice(-2);
+
+function onAgree(){ $('goBtn').disabled=!$('agreeChk').checked; }
+function goForm(){
+  const d=new Date();
+  agreedAt=`${d.getFullYear()}/${z2(d.getMonth()+1)}/${z2(d.getDate())} ${z2(d.getHours())}:${z2(d.getMinutes())}`;
+  $('consentScreen').classList.add('hide');
+  $('formScreen').classList.remove('hide');
+  $('formBar').classList.remove('hide');
+  $('hsub').textContent="必要項目をご入力ください。最後に「内容をコピー」を押し、LINEに貼り付けて送信してください。";
+  window.scrollTo({top:0,behavior:'smooth'}); r();
+}
+function setKbn(k){KBN=k;document.querySelectorAll('#kbnSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===k));r();}
+function setGyo(g){GYO=g;document.querySelectorAll('#gyoSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===g));r();}
+
+function r(){
+  const houjin=KBN==="法人";
+  $('houjinName').classList.toggle('hide',!houjin);
+  $('yagou').classList.toggle('hide',houjin);
+  $('repPos').classList.toggle('hide',!houjin);
+  $('repPosL').classList.toggle('hide',!houjin);
+  $('repNameL').innerHTML = houjin? '代表者 氏名 <span class="req">必須</span>' : '氏名（ご本人） <span class="req">必須</span>';
+  $('tantou').classList.toggle('hide',$('same').checked);
+  $('ryokanBox').classList.toggle('hide',GYO!=="旅館業");
+  $('minpakuBox').classList.toggle('hide',GYO!=="住宅宿泊事業");
+}
+
+function makeOutput(){
+  const need=[['repName','氏名'],['repKana','フリガナ'],['zip','郵便番号'],['tel','電話'],['addr','住所'],['mail','E-mail'],
+              ['fName','施設名称'],['fZip','施設郵便番号'],['fAddr','施設住所'],
+              ['bank','金融機関'],['branch','支店名'],['bnum','口座番号'],['bname','口座名義']];
+  if(KBN==="法人") need.push(['org','法人名']);
+  if(GYO==="旅館業") need.push(['lic','旅館業許可番号']); else need.push(['todoke','届出番号']);
+  const miss=need.filter(([id])=>!v(id)).map(x=>x[1]);
+  if(!v('toku')) miss.push('特別徴収の登録状況');
+  if(miss.length){ $('miss').textContent='未入力：'+miss.slice(0,4).join('・')+(miss.length>4?' ほか':'');
+    window.scrollTo({top:0,behavior:'smooth'}); return; }
+  $('miss').textContent='';
+
+  const tant=$('same').checked ? '（申請者と同じ）'
+     : `\n　氏名：${v('tName')}\n　部署：${v('tDept')}\n　電話：${v('tTel')}\n　Email：${v('tMail')}`;
+  const att=[...document.querySelectorAll('.att:checked')].map(c=>c.dataset.l).join('／')||'（未選択）';
+  const L=[];
+  L.push('■宿泊税補助金 申込み・ヒアリング回答■');
+  L.push('（このままLINEで送ってください）','');
+  L.push('【申込同意】補助金申請サポート申込書の内容に同意のうえ送信');
+  L.push('　同意日時：'+(agreedAt||'—'));
+  L.push('');
+  L.push('【区分】'+KBN);
+  L.push('【申請者】');
+  if(KBN==="法人"){ L.push('　法人名：'+v('org')); if(v('orgKana'))L.push('　法人名カナ：'+v('orgKana')); L.push('　代表者：'+v('repPos')+' '+v('repName')); }
+  else { if(v('yago'))L.push('　屋号：'+v('yago')); L.push('　氏名：'+v('repName')); }
+  L.push('　氏名カナ：'+v('repKana'));
+  L.push('　郵便番号：'+v('zip'));
+  L.push('　住所：'+v('addr'));
+  L.push('　電話：'+v('tel'));
+  L.push('　Email：'+v('mail'));
+  L.push('【担当者】'+tant);
+  L.push('【施設】');
+  L.push('　名称：'+v('fName'));
+  if(v('fKana'))L.push('　名称カナ：'+v('fKana'));
+  L.push('　郵便番号：'+v('fZip'));
+  L.push('　住所：'+v('fAddr'));
+  if(v('fTel'))L.push('　電話：'+v('fTel'));
+  L.push('　営業形態：'+GYO);
+  if(GYO==="旅館業") L.push('　旅館業許可番号：'+v('lic'));
+  else L.push('　住宅宿泊事業届出番号：'+(v('todoke')||'なし'));
+  L.push('　特別徴収義務者：'+v('toku'));
+  L.push('【振込口座】');
+  L.push('　金融機関：'+v('bank')+(v('bankCode')?'（'+v('bankCode')+'）':''));
+  L.push('　支店：'+v('branch')+(v('brCode')?'（'+v('brCode')+'）':''));
+  L.push('　種別：'+v('ptype'));
+  L.push('　口座番号：'+v('bnum'));
+  L.push('　名義カナ：'+v('bname'));
+  L.push('【手元の書類】'+att);
+  if(v('biko')) L.push('【ご要望・補足】'+v('biko'));
+  $('outText').value=L.join('\n');
+  // 誓約書へ差し込み
+  const d=new Date();
+  $('docDate').textContent='令和'+(d.getFullYear()-2018)+'年 '+(d.getMonth()+1)+'月 '+d.getDate()+'日';
+  $('docOrg').textContent = KBN==="法人" ? v('org') : (v('yago')||v('repName'));
+  $('docFacility').textContent = v('fName');
+  $('out').classList.remove('hide');
+  initSig();
+  $('out').scrollIntoView({behavior:'smooth'});
+}
+
+function copyOut(b){
+  const t=$('outText'); t.select(); t.setSelectionRange(0,99999);
+  const done=()=>{const o=b.textContent;b.textContent='✓ コピーしました！';setTimeout(()=>b.textContent=o,1500);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t.value).then(done,()=>{try{document.execCommand('copy');done();}catch(e){}}); }
+  else { try{document.execCommand('copy');done();}catch(e){alert('枠内を長押し→全選択→コピーしてください');} }
+}
+
+/* ===== 署名パッド＆PDF生成 ===== */
+let sigCtx,sigCanvas,drawing=false,sigDrawn=false,sigInited=false;
+function initSig(){
+  sigCanvas=$('sigCanvas');
+  if(sigInited) return;
+  const r=sigCanvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  sigCanvas.width=Math.max(300,r.width)*dpr; sigCanvas.height=160*dpr;
+  sigCtx=sigCanvas.getContext('2d'); sigCtx.scale(dpr,dpr);
+  sigCtx.lineWidth=2.5; sigCtx.lineCap='round'; sigCtx.lineJoin='round'; sigCtx.strokeStyle='#10243a';
+  const pos=e=>{const b=sigCanvas.getBoundingClientRect();const t=(e.touches&&e.touches[0])?e.touches[0]:e;return{x:t.clientX-b.left,y:t.clientY-b.top};};
+  const start=e=>{drawing=true;sigDrawn=true;const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);e.preventDefault();};
+  const move=e=>{if(!drawing)return;const p=pos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();e.preventDefault();};
+  const end=()=>{drawing=false;};
+  sigCanvas.addEventListener('mousedown',start); sigCanvas.addEventListener('mousemove',move); window.addEventListener('mouseup',end);
+  sigCanvas.addEventListener('touchstart',start,{passive:false}); sigCanvas.addEventListener('touchmove',move,{passive:false}); sigCanvas.addEventListener('touchend',end);
+  sigInited=true;
+}
+function clearSig(){ if(sigCtx){ sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height); sigDrawn=false; } }
+async function makePDF(btn){
+  if(!sigDrawn){ alert('署名欄に指でサインしてください'); return; }
+  if(!window.jspdf || !window.html2canvas){ alert('PDF機能を読み込み中です。数秒後にもう一度お試しください（通信環境をご確認ください）'); return; }
+  const o=btn.textContent; btn.textContent='作成中…'; btn.disabled=true;
+  try{
+    $('docSig').src=sigCanvas.toDataURL('image/png');
+    await new Promise(res=>setTimeout(res,80));
+    const el=$('seiyakuDoc'), prevW=el.style.width;
+    el.style.width='700px';
+    const cv=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',windowWidth:760});
+    el.style.width=prevW;
+    const img=cv.toDataURL('image/jpeg',0.95);
+    const {jsPDF}=window.jspdf, pdf=new jsPDF('p','mm','a4');
+    const pw=210, ph=297; let iw=pw, ih=cv.height*pw/cv.width;
+    if(ih>ph-4){ ih=ph-4; iw=cv.width*ih/cv.height; }
+    pdf.addImage(img,'JPEG',(pw-iw)/2,2,iw,ih);
+    const nm=(($('docOrg').textContent||'')||'宣誓同意書').replace(/[\\\/:*?"<>|　\s]/g,'');
+    pdf.save('宣誓・同意書_'+nm+'.pdf');
+    $('pdfDone').classList.remove('hide');
+    btn.textContent='✓ 保存しました'; setTimeout(()=>{btn.textContent=o;btn.disabled=false;},1800);
+  }catch(e){ alert('PDF作成でエラーが発生しました：'+(e&&e.message||e)); btn.textContent=o; btn.disabled=false; }
+}
+</script>
+</body>
+</html>
