@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宣誓・同意書 電子サイン｜宿泊税 システム改修等補助金</title>
+<style>
+  :root{--ink:#1b2a33;--sub:#5a6b74;--line:#dde6ea;--bg:#eef3f5;--card:#fff;
+        --acc:#0e7c86;--acc-d:#0a5b62;--err:#c0392b;--ok:#1f8a5b;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-text-size-adjust:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;
+       background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;padding-bottom:30px}
+  header{background:linear-gradient(135deg,#0e7c86,#0a5b62);color:#fff;padding:20px 16px}
+  header h1{font-size:18px;font-weight:800}
+  header p{font-size:13px;opacity:.92;margin-top:6px;line-height:1.5}
+  .wrap{max-width:600px;margin:0 auto;padding:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+  .card h2{font-size:15px;color:var(--acc-d);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .card h2 .n{background:var(--acc);color:#fff;width:24px;height:24px;border-radius:50%;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+  label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin:14px 0 5px}
+  label .req{color:var(--err);font-size:11px;margin-left:4px}
+  .hint{font-size:12px;color:var(--sub);font-weight:400;margin-top:3px}
+  input,select{width:100%;border:1.5px solid #cfd9de;border-radius:9px;padding:12px;
+        font-size:16px;font-family:inherit;color:var(--ink);background:#fff}
+  input:focus{outline:none;border-color:var(--acc)}
+  .seg{display:flex;gap:8px;margin-top:4px}
+  .seg button{flex:1;padding:11px;border:1.5px solid #cfd9de;background:#fff;border-radius:9px;
+        font-size:14px;font-weight:700;color:var(--sub);cursor:pointer}
+  .seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+  .btn{background:var(--acc);color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:800;cursor:pointer}
+  .btn:active{background:var(--acc-d)}
+  .btn:disabled{background:#a9c4c7}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>宣誓・同意書 電子サイン</h1>
+  <p>沖縄県宿泊税 システム改修等補助金。下記の宣誓・同意書をご確認のうえ、必要事項を入力し、署名欄に<b>指でサイン</b>→「PDFを作成」して<b>LINEに添付して送って</b>ください。入力・署名はこの端末内だけで処理され、どこにも保存されません。</p>
+</header>
+
+<div class="wrap">
+
+  <!-- 入力（誓約書に差し込む最小限） -->
+  <div class="card">
+    <h2><span class="n">1</span>必要事項の入力</h2>
+    <label>事業者の区分</label>
+    <div class="seg" id="kbnSeg">
+      <button type="button" data-v="法人" onclick="setKbn('法人')">法人</button>
+      <button type="button" data-v="個人事業主" class="on" onclick="setKbn('個人事業主')">個人事業主</button>
+    </div>
+    <label id="orgL">事業者名（屋号） <span class="req">必須</span></label>
+    <input id="org" placeholder="株式会社○○ / 古民家○○" oninput="bind()">
+    <div class="hint" id="orgHint">個人事業主の方は屋号（屋号がなければお名前）。</div>
+    <label>施設名 <span class="req">必須</span></label>
+    <input id="fac" placeholder="○○ホテル / ペンション○○" oninput="bind()">
+  </div>
+
+  <!-- 誓約書（公式様式に準拠） -->
+  <div class="card">
+    <h2><span class="n">2</span>宣誓・同意書にサイン</h2>
+    <div class="hint" style="margin-bottom:10px">下の内容をご確認のうえ、署名欄に指でサインしてください。署名は「氏名（自署）」欄に入ります。</div>
+    <div id="seiyakuDoc" style="background:#fff;color:#000;border:1px solid #ccc;border-radius:6px;padding:7% 14% 5%;font-family:'Yu Mincho','MS Mincho','Hiragino Mincho ProN','Noto Serif JP',serif;font-size:13px;line-height:1.85">
+      <div style="text-align:center;font-family:'Yu Gothic','MS Gothic','Hiragino Sans',sans-serif;font-size:19px;letter-spacing:6px;margin-bottom:18px">宣誓・同意書</div>
+      <p style="margin:0;text-indent:1em;text-align:justify">沖縄県宿泊税への対応に向けたシステム改修等補助金（以下「本補助金」という。）の申請に伴い、次の１～４までの全事項を宣誓し、５～８までのいずれにも同意します。</p>
+      <p style="margin:0 0 8px;text-indent:1em;text-align:justify">また、虚偽の宣誓を行った場合又は同意した事項に違反した場合は、本補助金交付要綱（以下「交付要綱」という。）第８条に基づく交付決定を受けていない場合は本補助金の交付申請を辞退し、交付要綱第８条に基づく交付決定を受け補助事業を実施又は完了したが本補助金の支払を受けていない場合は、交付要綱第11条に基づく補助事業の廃止の申請を行い、交付要綱第17条に基づく本補助金の支払いを受けていた場合は速やかに沖縄県に返還します。</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">１　交付要綱及び沖縄県が定める公募要領等に定める補助対象要件を満たしていること</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">２　本補助金の交付を受ける者として、別紙記載の「特別徴収義務者としての登録等の規定に関する誓約事項」、「暴力団排除に関する誓約事項」に同意していること</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">３　本補助金の申請内容全てに虚偽がないこと</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">４　「虚偽の申請による不正受給」、「補助金の目的外利用」や「補助金受給額を不当に釣り上げ、関係者へ報酬を配賦する」といった不正な行為に加担していないこと及び今後も加担しないこと</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">５　交付要綱第14条に基づき知事が行う立入検査等について応じること</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">６　提出した申請内容に記載された情報が本補助金の事務等のために第三者に提供される場合（補助対象要件の充足性を判断するために沖縄県が申請者の申請内容に記載された情報を第三者に提供する場合を含む。）及び本補助金の交付等に必要な範囲において申請者の個人情報が第三者から取得される場合（補助対象要件の充足性を判断するために沖縄県が申請者の個人情報を第三者から取得する場合を含む。）があること</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">７　本補助金を不正に受給した疑いがある場合には、補助金の受給者立ち会いのもと、事業に係る取引先（委託先、外注（請負）先等を含む）や補助金の受給者に対し現地調査等を実施すること</p>
+      <p style="margin:0;padding-left:2em;text-indent:-2em;text-align:justify">８　交付要綱等並びに県知事の指示に従うこと</p>
+      <div id="docDate" style="text-align:right;margin-top:22px">令和　年　月　日</div>
+      <div style="margin-top:8px;padding-left:6.3em">
+        <div>事業者名　<span id="docOrg"></span></div>
+        <div style="margin-top:6px">施設名　　<span id="docFac"></span></div>
+        <div style="margin-top:12px;display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap">
+          <span>法人代表者又は個人事業主の氏名（自署）</span>
+          <img id="docSig" alt="" style="height:40px">
+        </div>
+      </div>
+    </div>
+
+    <label>署名欄（ここに指でサイン）</label>
+    <canvas id="sigCanvas" style="width:100%;height:170px;border:2px dashed #9ec3c6;border-radius:9px;background:#fbfdfd;touch-action:none;display:block"></canvas>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button type="button" onclick="clearSig()" style="flex:0 0 auto;padding:11px 16px;border:1.5px solid #cfd9de;background:#fff;border-radius:9px;font-weight:700;color:#5a6b74">消す</button>
+      <button class="btn" style="flex:1" onclick="makePDF(this)">📄 PDFを作成して保存</button>
+    </div>
+    <div class="hint" style="margin-top:8px">※保存だけでは送信されません。保存したPDFファイルを、<b>LINEのトーク画面に添付して送って</b>ください。</div>
+    <div id="pdfDone" class="hide" style="margin-top:10px;background:#eafaf1;border:1px solid #b6e3c8;border-radius:9px;padding:13px;font-size:14px;color:#1f6b46;font-weight:700;text-align:center">✓ 宣誓・同意書PDFを保存しました<br>このPDFファイルを LINE に添付して送ってください 📩</div>
+  </div>
+</div>
+
+<div style="font-size:11px;color:#5a6b74;text-align:center;padding:8px 16px">沖縄県 宿泊税 システム改修等補助金 ｜ 宣誓・同意書 電子サイン</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+let KBN="個人事業主";
+const $=id=>document.getElementById(id), v=id=>($(id)?$(id).value.trim():""), z2=n=>('0'+n).slice(-2);
+function setKbn(k){KBN=k;document.querySelectorAll('#kbnSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===k));
+  $('orgL').innerHTML = (k==="法人"?'法人名（商号）':'事業者名（屋号）')+' <span class="req">必須</span>';
+  $('orgHint').textContent = k==="法人"?'登記上の法人名。':'個人事業主の方は屋号（屋号がなければお名前）。';
+}
+function bind(){ $('docOrg').textContent=v('org'); $('docFac').textContent=v('fac'); }
+function today(){ const d=new Date(); return '令和'+(d.getFullYear()-2018)+'年 '+(d.getMonth()+1)+'月 '+d.getDate()+'日'; }
+
+/* 署名パッド */
+let sigCtx,sigCanvas,drawing=false,sigDrawn=false;
+function initSig(){
+  sigCanvas=$('sigCanvas');
+  const r=sigCanvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  sigCanvas.width=Math.max(300,r.width)*dpr; sigCanvas.height=170*dpr;
+  sigCtx=sigCanvas.getContext('2d'); sigCtx.scale(dpr,dpr);
+  sigCtx.lineWidth=2.6; sigCtx.lineCap='round'; sigCtx.lineJoin='round'; sigCtx.strokeStyle='#10243a';
+  const pos=e=>{const b=sigCanvas.getBoundingClientRect();const t=(e.touches&&e.touches[0])?e.touches[0]:e;return{x:t.clientX-b.left,y:t.clientY-b.top};};
+  const start=e=>{drawing=true;sigDrawn=true;const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);e.preventDefault();};
+  const move=e=>{if(!drawing)return;const p=pos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();e.preventDefault();};
+  const end=()=>{drawing=false;};
+  sigCanvas.addEventListener('mousedown',start); sigCanvas.addEventListener('mousemove',move); window.addEventListener('mouseup',end);
+  sigCanvas.addEventListener('touchstart',start,{passive:false}); sigCanvas.addEventListener('touchmove',move,{passive:false}); sigCanvas.addEventListener('touchend',end);
+}
+function clearSig(){ if(sigCtx){ sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height); sigDrawn=false; } }
+
+async function makePDF(btn){
+  if(!v('org')||!v('fac')){ alert('事業者名と施設名を入力してください'); window.scrollTo({top:0,behavior:'smooth'}); return; }
+  if(!sigDrawn){ alert('署名欄に指でサインしてください'); return; }
+  if(!window.jspdf || !window.html2canvas){ alert('PDF機能を読み込み中です。数秒後にもう一度お試しください（通信環境をご確認ください）'); return; }
+  const o=btn.textContent; btn.textContent='作成中…'; btn.disabled=true;
+  try{
+    $('docDate').textContent=today(); bind();
+    $('docSig').src=sigCanvas.toDataURL('image/png');
+    await new Promise(res=>setTimeout(res,80));
+    const el=$('seiyakuDoc'), prevW=el.style.width; el.style.width='700px';
+    const cv=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',windowWidth:760});
+    el.style.width=prevW;
+    const img=cv.toDataURL('image/jpeg',0.95);
+    const {jsPDF}=window.jspdf, pdf=new jsPDF('p','mm','a4');
+    const pw=210, ph=297; let iw=pw, ih=cv.height*pw/cv.width;
+    if(ih>ph-4){ ih=ph-4; iw=cv.width*ih/cv.height; }
+    pdf.addImage(img,'JPEG',(pw-iw)/2,2,iw,ih);
+    const nm=(v('org')||'宣誓同意書').replace(/[\\\/:*?"<>|　\s]/g,'');
+    pdf.save('宣誓・同意書_'+nm+'.pdf');
+    $('pdfDone').classList.remove('hide');
+    btn.textContent='✓ 保存しました'; setTimeout(()=>{btn.textContent=o;btn.disabled=false;},1800);
+  }catch(e){ alert('PDF作成でエラーが発生しました：'+(e&&e.message||e)); btn.textContent=o; btn.disabled=false; }
+}
+
+$('docDate').textContent=today(); initSig();
+</script>
+</body>
+</html>
